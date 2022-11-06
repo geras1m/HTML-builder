@@ -103,7 +103,27 @@ const copyDir = async () => {
 // HTML
 
 const bundleOfHtml = async () => {
-  
+  const contentTemplateHtml = await fsPromises.readFile(path.join(__dirname, 'template.html'), 'utf8');
+  // fsPromises.writeFile(path.join(__dirname, 'project-dist', 'index.html'), contentTemplateHtml);
+  let contentOfComponent = '';
+  await fsPromises.readdir(path.join(__dirname, 'components'), {withFileTypes: true})
+    .then(components => {
+      // console.log(components);
+      components.forEach(component => {
+
+        if (component.isFile() && path.extname(component.name) === '.html'){
+          fsPromises.writeFile(path.join(__dirname, 'components', component.name), 'utf8')
+            .then(data => console.log(data));
+
+        }
+        // const nameOfComponent = component.name.split('.').slice(0, 1).join('');
+        // const contentOfComponent = fsPromises.readFile(path.join(__dirname, 'components', `${nameOfComponent.name}`), 'utf8');
+        // console.log(contentOfComponent)
+
+        // const readyHtml = contentTemplateHtml.replace(`{{${nameOfComponent}}}`, contentOfComponent);
+        // console.log(readyHtml);
+      });
+    });
 };
 
 bundleOfStyles();
