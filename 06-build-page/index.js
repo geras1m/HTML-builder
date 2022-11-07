@@ -23,13 +23,6 @@ fs.mkdir(pathToAssets, {recursive: true}, (err) => {
   }
 });
 
-// clean index.html
-/*fs.unlink(path.join(__dirname, 'project-dist', 'index.html'), (err)=>{
-  if (err){
-    throw err;
-  }
-});*/
-
 // create index.html
 fs.writeFile(path.join(__dirname, 'project-dist', 'index.html'), '', (err)=>{
   if (err){
