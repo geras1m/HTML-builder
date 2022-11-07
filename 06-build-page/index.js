@@ -24,11 +24,11 @@ fs.mkdir(pathToAssets, {recursive: true}, (err) => {
 });
 
 // clean index.html
-fs.unlink(path.join(__dirname, 'project-dist', 'index.html'), (err)=>{
+/*fs.unlink(path.join(__dirname, 'project-dist', 'index.html'), (err)=>{
   if (err){
     throw err;
   }
-});
+});*/
 
 // create index.html
 fs.writeFile(path.join(__dirname, 'project-dist', 'index.html'), '', (err)=>{
@@ -75,17 +75,6 @@ const copyDir = async () => {
             }
           });
 
-          fsPromises.readdir(path.join(pathToAssets, `${file.name}`), {withFileTypes: true})
-            .then( internalClearingFiles => {
-              internalClearingFiles.forEach(internalClearingFile => {
-                fs.unlink(path.join(pathToAssets, `${file.name}`, internalClearingFile.name), function(err){
-                  if (err) {
-                    throw (err);
-                  }
-                });
-              });
-            });
-
           fsPromises.readdir(path.join(__dirname, 'assets', `${file.name}`), {withFileTypes: true})
             .then(internalFiles => {
               internalFiles.forEach( internalFile => {
@@ -103,27 +92,28 @@ const copyDir = async () => {
 // HTML
 
 const bundleOfHtml = async () => {
+
   const contentTemplateHtml = await fsPromises.readFile(path.join(__dirname, 'template.html'), 'utf8');
-  // fsPromises.writeFile(path.join(__dirname, 'project-dist', 'index.html'), contentTemplateHtml);
-  let contentOfComponent = '';
+
+  let contentOfComponent = contentTemplateHtml;
   await fsPromises.readdir(path.join(__dirname, 'components'), {withFileTypes: true})
     .then(components => {
       // console.log(components);
       components.forEach(component => {
 
         if (component.isFile() && path.extname(component.name) === '.html'){
-          fsPromises.writeFile(path.join(__dirname, 'components', component.name), 'utf8')
-            .then(data => console.log(data));
 
+          fs.readFile(path.join(__dirname, 'components', `${component.name}`), 'utf-8', (err, data)=>{
+            if (err){
+              throw err;
+            }
+            contentOfComponent = contentOfComponent.replace(`{{${component.name.split('.').slice(0, 1).join('')}}}`, data);
+            fsPromises.writeFile(path.join(pathToProjectDist, 'index.html'), contentOfComponent);
+          });
         }
-        // const nameOfComponent = component.name.split('.').slice(0, 1).join('');
-        // const contentOfComponent = fsPromises.readFile(path.join(__dirname, 'components', `${nameOfComponent.name}`), 'utf8');
-        // console.log(contentOfComponent)
-
-        // const readyHtml = contentTemplateHtml.replace(`{{${nameOfComponent}}}`, contentOfComponent);
-        // console.log(readyHtml);
       });
     });
+  console.log('\n"index.html" created.');
 };
 
 bundleOfStyles();
